@@ -1,7 +1,7 @@
 /* $Id$
  *
- * Copyright   : (c) 2009 by Witham Laboratories Pty Ltd. All Rights Reserved
- * Project     : PCI SSL Assessment Tool
+ * Copyright   : (c) 2015 Open Source Solutions Pty Ltd. All Rights Reserved
+ * Project     : SecurityTools
  * File        : VisitorText
  *
  * Author      : Denis Dowling
