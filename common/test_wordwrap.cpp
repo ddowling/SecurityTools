@@ -14,11 +14,11 @@ void show(const char *label, StringVector &sv)
 
 int main()
 {
-    char *s0 = "Short line with no wrap";
+    const char *s0 = "Short line with no wrap";
     StringVector sv = wordWrap(s0, 80);
     show("Word wrapped 80", sv);
 
-    char *s1 =
+    const char *s1 =
 	"This is line1\n"
 	"This is line2\n"
 	"This is line3";
@@ -42,7 +42,7 @@ int main()
     sv = wordWrap(s1, 3);
     show("Word wrapped 3", sv);
 
-    char *s2 =
+    const char *s2 =
 	"Henry Dorsett Case is a low-level hustler in the dystopian "
 	"underworld of Chiba City, Japan. Once a talented computer hacker, "
 	"Case was caught stealing from his employer. As punishment for his "

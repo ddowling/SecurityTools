@@ -1,0 +1,4 @@
+To build run the following commands
+
+cmake .
+make
