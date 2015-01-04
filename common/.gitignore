@@ -1,0 +1,9 @@
+CMakeCache.txt
+CMakeFiles
+Makefile
+cmake_install.cmake
+libcommon.a
+report_test
+test_file
+test_line_draw
+test_wordwrap
