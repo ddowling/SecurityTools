@@ -3,5 +3,5 @@ project (SecurityTools)
 
 add_subdirectory(common)
 add_subdirectory(sslscan)
-# Not working with the latest libssh
-#add_subdirectory(sshscan)
+add_subdirectory(sshscan)
+add_subdirectory(ntpcheck)

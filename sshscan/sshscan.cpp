@@ -25,14 +25,16 @@ clients must be made or how a client should react.
 #include <signal.h>
 #include <errno.h>
 #include <libssh/libssh.h>
-#include <libssh/session.h>
-#include <libssh/ssh1.h>
+#include <libssh/ssh2.h>
+#include <libssh/callbacks.h>
+#include <libssh/server.h>
 
 #include <fcntl.h>
 
 char *host;
 
-static void usage(){
+static void usage()
+{
     fprintf(stderr,"Usage : sshscan [options] [login@]hostname\n"
 	    "Query SSH servers and retrieve information\n"
 	    "Options :\n"
@@ -40,19 +42,26 @@ static void usage(){
     exit(0);
 }
 
-static int opts(int argc, char **argv){
+static int opts(int argc, char **argv)
+{
+    // FIXME add options
     int i;
-    while((i=getopt(argc,argv,""))!=-1){
-        switch(i){
+    while((i=getopt(argc,argv,""))!=-1)
+    {
+        switch(i)
+	{
             default:
                 fprintf(stderr,"unknown option %c\n",optopt);
                 usage();
         }
     }
-    if(optind < argc)
-        host=argv[optind++];
-    if(host==NULL)
+
+    if (optind < argc)
+        host = argv[optind++];
+
+    if (host == 0)
         usage();
+
     return 0;
 }
 
@@ -102,6 +111,7 @@ struct mask_str
     const char *str;
 };
 
+#if 0
 struct mask_str ssh1_cipher_masks[] =
 {
     { 1 << SSH_CIPHER_NONE, "none" },
@@ -131,6 +141,7 @@ struct mask_str ssh_auth_methods[] =
     { SSH_AUTH_METHOD_HOSTBASED, "host based" },
     { SSH_AUTH_METHOD_INTERACTIVE, "interactive" },
 };
+#endif
 
 void process_log_callback(ssh_session session, int priority,
 			  const char *message, void *userdata)
@@ -175,8 +186,6 @@ int main(int argc, char **argv)
     opts(argc,argv);
 
     int test_pass;
-// FIXME just test SSH1
-//    for(test_pass = 1; test_pass < 2; test_pass++)
     for(test_pass = 0; test_pass < 2; test_pass++)
     {
 	printf("Test pass %d\n", test_pass);
@@ -209,51 +218,52 @@ int main(int argc, char **argv)
 
 	int connection_status = ssh_connect(session);
 
+	const char *server_banner = ssh_get_issue_banner(session);
+
+        int ssh1_allowed = false;
+	int ssh2_allowed = false;
+
 	// Ignore the connection status but if we have no banner then quit
-	if (session->serverbanner == 0)
+	if (server_banner != 0)
 	{
-	    fprintf(stderr,"Connection failed : %s\n", ssh_get_error(session));
-	    ssh_disconnect(session);
-	    ssh_finalize();
-	    return 1;
-	}
+	    // Dump out banners
+	    char version[10];
+	    analyse_banner(server_banner, version, &ssh1_allowed, &ssh2_allowed);
 
-	// Dump out banners
-	int ssh1_allowed;
-	int ssh2_allowed;
-	char version[10];
-	analyse_banner(session->serverbanner, version, &ssh1_allowed, &ssh2_allowed);
+	    // Output protocols
+	    printf("Protocol Version: %s\n", version);
+	    printf("SSH1 Allowed : %s\n", ssh1_allowed ? "Yes" : "No");
+	    printf("SSH2 Allowed : %s\n", ssh2_allowed ? "Yes" : "No");
+	    printf("Server banner : %s\n", server_banner);
 
-	// Output protocols
-	printf("Protocol Version: %s\n", version);
-	printf("SSH1 Allowed : %s\n", ssh1_allowed ? "Yes" : "No");
-	printf("SSH2 Allowed : %s\n", ssh2_allowed ? "Yes" : "No");
-	printf("Server banner : %s\n", session->serverbanner);
+	    // version holds the indication of either SSHv1 or SSHv2 connection
+	    printf("version : %d\n", ssh_get_version(session));
 
-	// version holds the indication of either SSHv1 or SSHv2 connection
-	printf("version : %d\n", session->version);
-
-	// Dump out the KEX information
-	extern const char *ssh_kex_nums[];
-	KEX *kex = &session->server_kex;
-	printf("Server Kex\n");
-	if (kex == 0 || kex->methods == 0)
-	    printf("No KEX parameters\n");
-	else
-	{
-	    int i;
-	    for(i = 0; i < 10; i++)
+#if 0
+	    // Dump out the KEX information
+	    extern const char *ssh_kex_nums[];
+	    KEX *kex = &session->server_kex;
+	    printf("Server Kex\n");
+	    if (kex == 0 || kex->methods == 0)
+		printf("No KEX parameters\n");
+	    else
 	    {
-		printf("%s: %s\n", ssh_kex_nums[i], kex->methods[i]);
+		int i;
+		for(i = 0; i < 10; i++)
+		{
+		    printf("%s: %s\n", ssh_kex_nums[i], kex->methods[i]);
+		}
 	    }
+#endif
 	}
 
 	// Check connection status after we have dumped out some information
 	// Otherwise incompatible cipher suites for client and server just
-	// terminate the applicationy
+	// terminate the application
 	if (connection_status != 0)
 	{
-	    fprintf(stderr,"Connection failed : %s\n", ssh_get_error(session));
+	    fprintf(stderr,"Connection failed : %s (status=%d)\n",
+		    ssh_get_error(session), connection_status);
 	    ssh_disconnect(session);
 	    ssh_finalize();
 	    return 1;

@@ -9,5 +9,12 @@ link_directories(
     ${CMAKE_SOURCE_DIR}/external/${LIBSSH}/build/libssh
 )
 
-add_executable(sshscan sshscan.cpp)
-target_link_libraries(sshscan common ssh_static crypto z)
+add_executable(sshscan
+    sshscan.cpp
+)
+target_link_libraries(sshscan
+    common
+    ssh
+    crypto
+    z
+)
