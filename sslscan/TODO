@@ -1,0 +1,36 @@
+- Take a URL as an argument
+- Output to HTML like ssl digger
+- Fix formatting of the certificate serial number and also the logo
+- Certificate times in localtime as well as GMT
+- PCI PASS or fail summary. This to be based on PCI-DSS glossary of strong crypto but make a warning about MEDIUM crypto RC4 ciphers
+- Bullet format output suitable to paste into the strong crypto section of the PCI report
+- Show the resolved IP addresses in the results
+- Need to actually complete the https request each cipher suite to ensure that the server is not just returning an error about the use of a weak cipher. See http://support.citrix.com/article/CTX119993
+- Perfect Forwarding Security (PFS) column
+- NIST column
+- Must include the date and time of the scan and where it was run from similar to the luhn_scan
+- Colour the PASS and FAIL indication.
+- option to control the timeout for SSL connection. Useful when no service is on port 443
+- Automatic starttls for port 25 and 587
+- starttls also for imap port 143. a001 CAPABILITY then a002 STARTTLS. See http://tools.ietf.org/html/rfc2595
+
+
+Same too for SSH
+- Show SSH versions supported
+- Show ciphers supported
+- ssh -v does this to.
+
+Done
+- Output cipher details including strength, key lengths etc
+- This scan does not seem to show TLSv1 ciphers.
+- Progress should not be logged to the output file
+- Tool to scan for certificate expiry
+- PCI and other compliance in the preferred cipher column
+- Shorter output has only the accepted ciphers, Status, Version, Cipher, Strength, PCI and no certificate info. In fact drop all of the Status field except for verbose output
+- Want to analyse the PCI compliance of the default ciphers
+- The wide output display really messes up under windows dos box
+- Want to analyse the PCI compliance of the certificate.
+  -- Date range value
+  -- Trusted signing authority
+  -- RSA keys > 1024
+  -- SHA1
